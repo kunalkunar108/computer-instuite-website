@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { ArrowRight, ArrowUpRight, Award, BookOpen, BriefcaseBusiness, CalendarDays, Check, ChevronDown, ChevronRight, CircleHelp, Code2, Computer, Download, FileText, GraduationCap, Laptop, LayoutDashboard, LogIn, Mail, MapPin, Menu, MessageCircle, Monitor, Phone, Play, Plus, Search, ShieldCheck, Sparkles, Star, Users, Wallet, X, Clock3, Bell, Settings, ClipboardCheck, BookMarked, ChartNoAxesCombined, LogOut, Upload, UserRound, BookOpenCheck, CalendarCheck, IndianRupee, PanelLeftClose, ExternalLink } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Award, BookOpen, BriefcaseBusiness, CalendarDays, Check, ChevronDown, ChevronRight, CircleHelp, Code2, Computer, Download, FileText, GraduationCap, Laptop, LayoutDashboard, LogIn, Mail, MapPin, Menu, MessageCircle, Monitor, Phone, Play, Plus, Search, ShieldCheck, Sparkles, Star, Users, Wallet, X, Clock3, Bell, Settings, ClipboardCheck, BookMarked, BarChart3, LogOut, Upload, UserRound, BookOpenCheck, CalendarCheck, IndianRupee, PanelLeftClose, ExternalLink } from 'lucide-react';
 import { supabase, isPreviewMode } from './lib/supabase';
 
 type Course = {id:string|number; title:string; category:string; duration:string; fee:number; level:string; description:string; icon:string; popular?:boolean};
@@ -60,6 +60,7 @@ function Login({setSigned,toast}:any){const [email,setEmail]=useState('');const 
 function Portal({signed,setSigned,signOut,students,setStudents,courses,setCourses,applications,setApplications,toast}:any){
  const [tab,setTab]=useState('Overview');const [search,setSearch]=useState('');const [modal,setModal]=useState('');const [draft,setDraft]=useState<any>({});const [localUser,setLocalUser]=useState(signed);const nav=useNavigate();const location=useLocation();const admin=location.pathname.startsWith('/admin');const role=admin?'admin':'student';
  useEffect(()=>{if(signed){setLocalUser(signed)}},[signed]);
+ useEffect(()=>{let alive=true;if(admin&&supabase){supabase.from('admissions').select('*').order('created_at',{ascending:false}).then(({data,error})=>{if(alive&&data&&!error)setApplications(data.map((x:any)=>({id:x.id,name:x.full_name,email:x.email,phone:x.phone,course:x.course_title,date:new Date(x.created_at).toLocaleDateString('en-IN'),status:x.status==='new'?'New':x.status.charAt(0).toUpperCase()+x.status.slice(1)})))});}return()=>{alive=false}},[admin]);
  useEffect(()=>{setTab('Overview')},[location.pathname]);
  const menus=admin?[['Overview',LayoutDashboard],['Students',Users],['Admissions',FileText],['Courses',BookOpen],['Fees & payments',Wallet],['Attendance',CalendarCheck],['Examinations',ClipboardCheck],['Certificates',Award],['Settings',Settings]]:[['Overview',LayoutDashboard],['My courses',BookOpen],['Attendance',CalendarCheck],['Fees & payments',Wallet],['Study materials',BookMarked],['Assignments',FileText],['Examinations',ClipboardCheck],['Results',Award],['My profile',UserRound]];
  const count=students.length;const due=students.reduce((a,s)=>a+(s.total-s.paid),0);
